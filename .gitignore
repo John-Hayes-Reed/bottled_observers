@@ -8,5 +8,9 @@
 /spec/reports/
 /tmp/
 
+#rubymine
+/.idea
+/.idea/*
+
 # rspec failure tracking
 .rspec_status
