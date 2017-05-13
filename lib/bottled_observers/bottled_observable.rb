@@ -20,11 +20,11 @@ module BottledObservable
   # @param args [Hash] Additional Arguments to be passed to the observer.
   #
   # @example
-  #   @model.subscribe_to(LastUpdatedAtObserver)
+  #   @model.add_subscription(LastUpdatedAtObserver)
   #
   # @return [void]
   def add_subscription(observer, **args)
-    subscriptions << observer.new(self, args)
+    subscriptions << observer.new(self, args.merge({method_source: __method__}))
   end
 
   # Removes an observer from the instances subscriptions list.
@@ -32,25 +32,31 @@ module BottledObservable
   # @param observer [BottledObserver] The observer class to remove.
   #
   # @example
-  #   @model.unsubscribe(LastUpdatedAtObserver)
+  #   @model.remove_subscription(LastUpdatedAtObserver)
   #
   # @return [void]
   def remove_subscription(observer)
+    puts observer
     subscriptions.delete_if { |ob| ob.class == observer }
   end
 
   # Removes all current subscriptions.
   #
+  # @example
+  #   @model.remove_subscriptions
   # @return [void]
   def remove_subscriptions
-    subscriptions.each(&method(:remove_subscription))
+    puts 'entered'
+    subscriptions.map(&:class).each(&method(:remove_subscription))
   end
 
-  # Calls the update method of all subscriptions.
+  # Calls the update method of all subscriptions and returns the modified state
+  #   back to false.
   #
   # @return [void]
   def publish
-    subscriptions.each(&:call)
+    subscriptions.each(&:call) if publishable?
+    modified false
   end
 
   # Changes the observable state of the instance.
@@ -61,13 +67,19 @@ module BottledObservable
   #
   # @return [void]
   def modified(state = true, **_opts)
+    raise TypeError unless state == true || state == false
     @observable_state = state
   end
 
   # Gives the instance's current observable state.
   #
+  # @example
+  #   @model.publishable? #=> false
+  #   @model.modified
+  #   @model.publishable? #=> true
+  #
   # @return [true, false]
-  def observable_state
+  def publishable?
     @observable_state ||= false
   end
 end

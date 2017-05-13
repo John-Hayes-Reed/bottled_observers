@@ -15,10 +15,11 @@ module BottledObserver
     raise BottledObserverErrors::SubscriptionObjectNotObservable unless
       subscription.singleton_class < BottledObservable
 
+    method_source = options.delete(:method_source)
     @subscription = subscription
     @options = options
 
-    subscribe
+    subscribe unless method_source =~ /add_subscription/
   end
 
   private
@@ -27,7 +28,7 @@ module BottledObserver
   #
   # @return [void]
   def subscribe
-    @subscription.add_subscription self
+    @subscription.add_subscription self.class
   end
 
   # Checks if the subscription state is modified or not.

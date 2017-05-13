@@ -8,6 +8,8 @@
 /spec/reports/
 /tmp/
 
+# RVM
+/.rvmrc
 #rubymine
 /.idea
 /.idea/*
