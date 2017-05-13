@@ -136,7 +136,7 @@ To remove observers of a particular class, use `#remove_subscription`:
 @product.subscriptions #=> []
 ```
 
-Or use `#remove_subscriptions` *(notice the plural)* to, you guessed it, remoe **all** observers:
+Or use `#remove_subscriptions` *(notice the plural)* to, you guessed it, remove **all** observers:
 ```ruby
 @product.add_subscription SendPushNotification
 @product.add_subscription MailToMailingList
@@ -170,4 +170,4 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 ## Code of Conduct
 
-Everyone interacting in the BottledObservers project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/bottled_observers/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the BottledObservers project’s codebases, issue trackers, chat rooms and mailing lists is expected to have a beer or two before and enjoy life. Oh yeah and apparently this too: [code of conduct](https://github.com/[USERNAME]/bottled_observers/blob/master/CODE_OF_CONDUCT.md).
