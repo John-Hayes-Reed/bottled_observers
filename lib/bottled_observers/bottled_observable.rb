@@ -46,7 +46,6 @@ module BottledObservable
   #   @model.remove_subscriptions
   # @return [void]
   def remove_subscriptions
-    puts 'entered'
     subscriptions.map(&:class).each(&method(:remove_subscription))
   end
 

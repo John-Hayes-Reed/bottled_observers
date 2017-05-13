@@ -1,8 +1,12 @@
 # BottledObservers
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/bottled_observers`. To experiment with that code, run `bin/console` for an interactive prompt.
+## The best thing to happen since bottled water
 
-TODO: Delete this and the text above, and describe your gem
+Wait, wasn't that [bottled_decorators?](https://github.com/John-Hayes-Reed/bottled_decorators),
+or was it [bottled_services?](https://github.com/John-Hayes-Reed/bottled_services), 
+I am starting to lose track. Anyway! bottled_observers are an easy-to-use solution, 
+for the Observer / Subscribe-Publish pattern in ruby. all you need to worry about 
+is adding your business logic, let bottled_observers handle the rest!
 
 ## Installation
 
@@ -22,7 +26,133 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+bottled_observers has two main modules you need to be aware of; BottledObserver and BottledObservable.  
+
+#### BottledObserver
+
+This module should be included in your observer class, and that observer class 
+should only contain a single public method: `#call`.  
+eg:
+
+```ruby
+class SendPushNotification
+  include BottledObserver # <-- just like this!
+  
+  def call
+    # Some intense and awesome logic to notify the hell out of them users.
+  end
+end
+```
+
+That is all there is to it, your observer is now ready to rock'n'roll.
+
+#### BottledObservable
+
+This module is included in any class that should allow observers to subscribe to it.  
+eg:
+
+```ruby
+class Product
+  include BottledObservable # <-- and just like this!
+  
+  # The rest of the class....
+end
+```
+
+And that is it, your whole bottled_observers subscribe/publish cycle is ready to go.
+
+#### The Subscribe / Publish Cycle  
+
+There are three main methods available in your arsenal that you need to be aware of:
+* `#add_subscription`
+* `#modified`
+* `#publish`
+
+These are available to your observable class instances, so if we wanted to subscribe
+our `SendPushNotification` observer to an instance of our `Product` class, we could
+do the following:
+
+```ruby
+@product = Product.find(1)                     # <-- instantiate Product from a record in the database. 
+@product.add_subscription SendPushNotification # <-- add a subscription for the SendPushNotification class
+```
+
+We now have a `SendPushNotification` observer lying in wait for any publications from the `@product` instance.  
+Then, when we want to notify the observer(s) of any changes to the instance, just 
+set the state of the instance as *modified* using the `#modified` method, and publish
+this change of state to its subscribers:
+
+*Example case: sending push notifications after a successful save of the @product instance.*
+```ruby
+# The product is only in a modified state if the save is successful
+@product.modified if @product.save
+ 
+# If the @product's state is 'modified' the observers call method will be excecuted. 
+# If the state is not modified, nothing will happen.
+@product.publish
+```
+
+**Super simple!**
+
+Another thing that needs to be noted is, after publishing, the instances *modified* 
+state is reset, so to publish anything again, it must be set again.
+
+```ruby
+@product.modified
+@product.publish # <-- push notifications sent.
+@product.publish # <-- push notifications not sent.
+```
+
+```ruby
+@product.modified
+@product.publish # <-- push notifications sent.
+@product.modified
+@product.publish # <-- push notifications sent.
+```
+
+#### Extras
+
+You can have as many observers subscribed to a single instance as you like:
+```ruby
+@product.add_subscription SendPushNotification
+@product.add_subscription MailToMailingList
+@product.add_subscription CreateRecentActivityRecord
+
+@product.modified if @product.save
+@product.publish
+```
+
+`#subscriptions` will return an array of current observer instances subscribed to the observable instance:
+```ruby
+@product.add_subscription SendPushNotification
+@product.subscriptions #=> [#<SendPushNotification:0x00...>]
+```
+
+To remove observers of a particular class, use `#remove_subscription`:
+```ruby
+@product.add_subscription SendPushNotification
+@product.subscriptions #=> [#<SendPushNotification:0x00...>]
+@product.remove_subscription SendPushNotification
+@product.subscriptions #=> []
+```
+
+Or use `#remove_subscriptions` *(notice the plural)* to, you guessed it, remoe **all** observers:
+```ruby
+@product.add_subscription SendPushNotification
+@product.add_subscription MailToMailingList
+@product.add_subscription CreateRecentActivityRecord
+@product.subscriptions #=> [#<SendPushNotification:0x00...>, ...]
+
+@product.remove_subscriptions
+@product.subscriptions #=> []
+```
+
+You can also check if your product is in a modified state by checking if it is `#publishable?`:
+```ruby
+@product.publishable? #=> false
+@product.modified
+@product.publishable? #=> true
+```
 
 ## Development
 
@@ -32,7 +162,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/bottled_observers. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/John-Hayes-Reed/bottled_observers. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
