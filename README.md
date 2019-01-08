@@ -1,5 +1,7 @@
 # BottledObservers
 
+![](https://ruby-gem-downloads-badge.herokuapp.com/bottled_observers?type=total)
+
 ## The best thing to happen since bottled water
 
 Wait, wasn't that [bottled_decorators?](https://github.com/John-Hayes-Reed/bottled_decorators),
