@@ -36,7 +36,6 @@ module BottledObservable
   #
   # @return [void]
   def remove_subscription(observer)
-    puts observer
     subscriptions.delete_if { |ob| ob.class == observer }
   end
 
